@@ -7,6 +7,9 @@ using Spectre.Console;
 
 namespace AzAppConfigToUserSecrets.Cli.Infrastructure;
 
+/// <summary>
+/// Interface which enabled interop between System.CommandLine and Spectre.Console.
+/// </summary>
 public interface ICompositeConsole : IConsole, IAnsiConsole
 {
 }

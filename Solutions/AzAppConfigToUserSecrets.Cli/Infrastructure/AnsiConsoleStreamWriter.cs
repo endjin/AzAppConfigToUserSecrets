@@ -7,17 +7,25 @@ using Spectre.Console;
 
 namespace AzAppConfigToUserSecrets.Cli.Infrastructure;
 
+/// <summary>
+/// Write to <see cref="IAnsiConsole"/>.
+/// </summary>
 internal sealed class AnsiConsoleStreamWriter : IStandardStreamWriter
 {
-  private readonly IAnsiConsole console;
+    private readonly IAnsiConsole console;
 
-  public AnsiConsoleStreamWriter(IAnsiConsole console)
-  {
-    this.console = console;
-  }
+    /// <summary>
+    /// Create a new AnsiConsoleStreamWriter.
+    /// </summary>
+    /// <param name="console">Represents a console.</param>
+    public AnsiConsoleStreamWriter(IAnsiConsole console)
+    {
+        this.console = console;
+    }
 
-  public void Write(string? value)
-  {
-    this.console.Write(value!);
-  }
+    /// <inheritdoc />
+    public void Write(string? value)
+    {
+        this.console.Write(value!);
+    }
 }

@@ -3,16 +3,19 @@
 // </copyright>
 
 using System.CommandLine.Invocation;
+
 using AzAppConfigToUserSecrets.Cli.Infrastructure;
+
 using Azure;
 using Azure.Data.AppConfiguration;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+
 using Spectre.Console;
 
 namespace AzAppConfigToUserSecrets.Cli;
 
-public static class ExportHandler
+internal static class ExportHandler
 {
   public static async Task<int> ExecuteAsync(
     string tenantId,
@@ -23,16 +26,15 @@ public static class ExportHandler
   {
     await console.Status().StartAsync("Thinking...", async ctx =>
     {
-      var credentials = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions {TenantId = tenantId});
+      var credentials = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions { TenantId = tenantId });
       var client = new ConfigurationClient(new Uri(endpoint), credentials);
-      
-      var selector = new SettingSelector {Fields = SettingFields.All};
+      var selector = new SettingSelector { Fields = SettingFields.All };
       Pageable<ConfigurationSetting> settings = client.GetConfigurationSettings(selector);
 
       var userSecretsStore = new UserSecretsStore(userSecretsId);
-      var secrets = userSecretsStore.Load();
+      IDictionary<string, string> secrets = userSecretsStore.Load();
       ctx.Status($"Authentication against Azure Tenant {tenantId}");
-      
+
       foreach (ConfigurationSetting setting in settings)
       {
         ctx.Status($"Retrieving Data from App Configuration {endpoint}");
@@ -53,7 +55,7 @@ public static class ExportHandler
 
       userSecretsStore.Save();
     }).ConfigureAwait(false);
-      
+
     console.WriteLine("All Done!");
 
     return 0;

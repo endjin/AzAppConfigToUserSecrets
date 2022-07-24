@@ -8,44 +8,62 @@ using Spectre.Console.Rendering;
 
 namespace AzAppConfigToUserSecrets.Cli.Infrastructure;
 
+/// <summary>
+/// Provides interoperability between System.CommandLine and Spectre.Console.
+/// </summary>
 internal sealed class CompositeConsole : ICompositeConsole
 {
-  private readonly AnsiConsoleStreamWriter standardOut;
-  private readonly IStandardStreamWriter standardError;
+    private readonly AnsiConsoleStreamWriter standardOut;
+    private readonly IStandardStreamWriter standardError;
 
-  public CompositeConsole()
-  {
-    this.standardOut = new AnsiConsoleStreamWriter(AnsiConsole.Console);
-    this.standardError = StandardStreamWriter.Create(Console.Error);
-  }
+    /// <summary>
+    /// Create a new instance of CompositeConsole.
+    /// </summary>
+    public CompositeConsole()
+    {
+        this.standardOut = new AnsiConsoleStreamWriter(AnsiConsole.Console);
+        this.standardError = StandardStreamWriter.Create(Console.Error);
+    }
 
-  bool IStandardOut.IsOutputRedirected => Console.IsOutputRedirected;
+    /// <inheritdoc />
+    bool IStandardOut.IsOutputRedirected => Console.IsOutputRedirected;
 
-  bool IStandardError.IsErrorRedirected => Console.IsErrorRedirected;
+    /// <inheritdoc />
+    bool IStandardError.IsErrorRedirected => Console.IsErrorRedirected;
 
-  bool IStandardIn.IsInputRedirected => Console.IsInputRedirected;
+    /// <inheritdoc />
+    bool IStandardIn.IsInputRedirected => Console.IsInputRedirected;
 
-  IStandardStreamWriter IStandardOut.Out => this.standardOut;
+    /// <inheritdoc />
+    IStandardStreamWriter IStandardOut.Out => this.standardOut;
 
-  IStandardStreamWriter IStandardError.Error => this.standardError;
+    /// <inheritdoc />
+    IStandardStreamWriter IStandardError.Error => this.standardError;
 
-  public Profile Profile => AnsiConsole.Console.Profile;
+    /// <inheritdoc />
+    public Profile Profile => AnsiConsole.Console.Profile;
 
-  public IAnsiConsoleCursor Cursor => AnsiConsole.Console.Cursor;
+    /// <inheritdoc />
+    public IAnsiConsoleCursor Cursor => AnsiConsole.Console.Cursor;
 
-  public IAnsiConsoleInput Input => AnsiConsole.Console.Input;
+    /// <inheritdoc />
+    public IAnsiConsoleInput Input => AnsiConsole.Console.Input;
 
-  public IExclusivityMode ExclusivityMode => AnsiConsole.Console.ExclusivityMode;
+    /// <inheritdoc />
+    public IExclusivityMode ExclusivityMode => AnsiConsole.Console.ExclusivityMode;
 
-  public RenderPipeline Pipeline => AnsiConsole.Console.Pipeline;
+    /// <inheritdoc />
+    public RenderPipeline Pipeline => AnsiConsole.Console.Pipeline;
 
-  public void Clear(bool home)
-  {
-    AnsiConsole.Console.Clear(home);
-  }
+    /// <inheritdoc />
+    public void Clear(bool home)
+    {
+        AnsiConsole.Console.Clear(home);
+    }
 
-  public void Write(IRenderable renderable)
-  {
-    AnsiConsole.Console.Write(renderable);
-  }
+    /// <inheritdoc />
+    public void Write(IRenderable renderable)
+    {
+        AnsiConsole.Console.Write(renderable);
+    }
 }

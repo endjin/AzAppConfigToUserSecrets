@@ -1,50 +1,54 @@
-﻿namespace AzAppConfigToUserSecrets.Cli;
+﻿// <copyright file="UserSecretsStore.cs" company="Endjin Limited">
+// Copyright (c) Endjin Limited. All rights reserved.
+// </copyright>
 
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
 
-public class UserSecretsStore
+namespace AzAppConfigToUserSecrets.Cli;
+
+internal class UserSecretsStore
 {
-  private IDictionary<string, string> secrets = new Dictionary<string, string>();
-  private readonly string userSecretsId;
+    private readonly string userSecretsId;
+    private IDictionary<string, string> secrets = new Dictionary<string, string>();
 
-  public UserSecretsStore(string userSecretsId)
-  {
-    this.userSecretsId = userSecretsId;
-  }
-
-  public void Set(string key, string value) => this.secrets[key] = value;
-
-  public string this[string key] => this.secrets[key];
-
-  public void Save()
-  {
-    var secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
-    JsonObject jsonObject = new JsonObject();
-
-    foreach (KeyValuePair<string, string> keyValuePair in secrets.AsEnumerable())
+    public UserSecretsStore(string userSecretsId)
     {
-      jsonObject[keyValuePair.Key] = keyValuePair.Value;
+        this.userSecretsId = userSecretsId;
     }
 
-    File.WriteAllText(secretsFilePath, jsonObject.ToString());
-  }
+    public string this[string key] => this.secrets[key];
 
-  public IDictionary<string, string> Load()
-  {
-    var secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
+    public void Set(string key, string value) => this.secrets[key] = value;
 
-    this.secrets = new ConfigurationBuilder()
-      .AddJsonFile(secretsFilePath, true)
-      .Build()
-      .AsEnumerable()
-      .Where((Func<KeyValuePair<string, string>, bool>) (i => i.Value != null))
-      .ToDictionary(
-        i => i.Key,
-        i => i.Value,
-        StringComparer.OrdinalIgnoreCase);
+    public void Save()
+    {
+        string? secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
+        JsonObject jsonObject = new();
 
-    return this.secrets;
-  }
+        foreach (KeyValuePair<string, string> keyValuePair in this.secrets.AsEnumerable())
+        {
+          jsonObject[keyValuePair.Key] = keyValuePair.Value;
+        }
+
+        File.WriteAllText(secretsFilePath, jsonObject.ToString());
+    }
+
+    public IDictionary<string, string> Load()
+    {
+        string? secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
+
+        this.secrets = new ConfigurationBuilder()
+          .AddJsonFile(secretsFilePath, true)
+          .Build()
+          .AsEnumerable()
+          .Where((Func<KeyValuePair<string, string>, bool>)(i => i.Value != null))
+          .ToDictionary(
+            i => i.Key,
+            i => i.Value,
+            StringComparer.OrdinalIgnoreCase);
+
+        return this.secrets;
+    }
 }
