@@ -14,9 +14,9 @@ public class CommandLineParser
     this.console = console;
   }
 
-  public delegate Task Export(string tenantId, string userSecretsId, string endpoint, ICompositeConsole console, InvocationContext invocationContext = null);
+  public delegate Task Export(string tenantId, string userSecretsId, string endpoint, ICompositeConsole console, InvocationContext? invocationContext = null);
 
-  public Parser Create(Export export = null)
+  public Parser Create(Export? export = null)
   {
     // if environmentInit hasn't been provided (for testing) then assign the Command Handler
     export ??= ExportHandler.ExecuteAsync;
@@ -45,23 +45,26 @@ public class CommandLineParser
       {
         Description = "Id of AAD Tenant that contains your App Configuration Service",
         Arity = ArgumentArity.ExactlyOne,
+        IsRequired = true,
       };
 
       var userSecretsIdArg = new Option<string>("--user-secrets-id")
       {
         Description = "User Secrets Id for your application",
         Arity = ArgumentArity.ExactlyOne,
+        IsRequired = true,
       };
 
       var endpointArg = new Option<string>("--endpoint")
       {
-        Description = "Azure Application Configuration Service endpoint",
+        Description = "Azure Application Configuration Service endpoint (URI)",
         Arity = ArgumentArity.ExactlyOne,
+        IsRequired = true,
       };
 
-      cmd.Add(tenantIdArg);
-      cmd.Add(userSecretsIdArg);
-      cmd.Add(endpointArg);
+      cmd.AddOption(tenantIdArg);
+      cmd.AddOption(userSecretsIdArg);
+      cmd.AddOption(endpointArg);
 
       cmd.SetHandler(async (context) =>
       {

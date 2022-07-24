@@ -16,8 +16,8 @@ internal sealed class AnsiConsoleStreamWriter : IStandardStreamWriter
     this.console = console;
   }
 
-  public void Write(string value)
+  public void Write(string? value)
   {
-    this.console.Write(value);
+    this.console.Write(value!);
   }
 }

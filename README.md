@@ -1,5 +1,18 @@
 # AzAppConfigToUserSecrets
+
 A dotnet global tool for extracting settings from Azure App Configuration Service and stashing them as User Secrets.
+
+## Installing the tool
+
+Use the following command to install the .NET Global Tool:
+
+`dotnet tool install --global AzAppConfigToUserSecrets.Cli`
+
+To invoke the tool you need to use the name `actus` (***A***pp***C***onfig***T***o***U***ser***S***ecrets)
+
+You can uninstall the tool with the following command:
+
+`dotnet tool uninstall --global AzAppConfigToUserSecrets.Cli`
 
 ## Usage
 

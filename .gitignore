@@ -348,4 +348,4 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-/Solutions/AzAppConfigToUserSecrets/AzAppConfigToUserSecrets.Cli/Properties/launchSettings.json
+/Solutions/AzAppConfigToUserSecrets.Cli/Properties/launchSettings.json
