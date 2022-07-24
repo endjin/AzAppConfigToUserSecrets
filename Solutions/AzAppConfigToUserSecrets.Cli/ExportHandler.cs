@@ -3,61 +3,72 @@
 // </copyright>
 
 using System.CommandLine.Invocation;
-
 using AzAppConfigToUserSecrets.Cli.Infrastructure;
-
 using Azure;
 using Azure.Data.AppConfiguration;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-
 using Spectre.Console;
 
 namespace AzAppConfigToUserSecrets.Cli;
 
+/// <summary>
+/// Exports settings data from the Azure App Configuration Service to .NET User Settings.
+/// </summary>
 internal static class ExportHandler
 {
-  public static async Task<int> ExecuteAsync(
-    string tenantId,
-    string userSecretsId,
-    string endpoint,
-    ICompositeConsole console,
-    InvocationContext? context = null)
-  {
-    await console.Status().StartAsync("Thinking...", async ctx =>
+    /// <summary>
+    /// Command Handler invoked by the Export command.
+    /// </summary>
+    /// <param name="tenantId">Azure AD Tenant Id.</param>
+    /// <param name="userSecretsId">User Secret Id to write settings to.</param>
+    /// <param name="endpoint">Azure App Configuration Service URL endpoint.</param>
+    /// <param name="console">Console to write output to.</param>
+    /// <param name="context">System.CommandLine InvocationContext for Command Line Args.</param>
+    /// <returns>Whether the command executed successfully.</returns>
+    public static async Task<int> ExecuteAsync(
+        string tenantId,
+        string userSecretsId,
+        string endpoint,
+        ICompositeConsole console,
+        InvocationContext? context = null)
     {
-      var credentials = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions { TenantId = tenantId });
-      var client = new ConfigurationClient(new Uri(endpoint), credentials);
-      var selector = new SettingSelector { Fields = SettingFields.All };
-      Pageable<ConfigurationSetting> settings = client.GetConfigurationSettings(selector);
-
-      var userSecretsStore = new UserSecretsStore(userSecretsId);
-      IDictionary<string, string> secrets = userSecretsStore.Load();
-      ctx.Status($"Authentication against Azure Tenant {tenantId}");
-
-      foreach (ConfigurationSetting setting in settings)
-      {
-        ctx.Status($"Retrieving Data from App Configuration {endpoint}");
-
-        if (setting is SecretReferenceConfigurationSetting secretReference)
+        await console.Status().StartAsync("Thinking...", async ctx =>
         {
-          var identifier = new KeyVaultSecretIdentifier(secretReference.SecretId);
-          var secretClient = new SecretClient(identifier.VaultUri, credentials);
-          Response<KeyVaultSecret>? secret = await secretClient.GetSecretAsync(identifier.Name, identifier.Version);
-          userSecretsStore.Set(setting.Key, secret.Value.Value);
-          continue;
-        }
+            var credentials = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions { TenantId = tenantId });
+            var client = new ConfigurationClient(new Uri(endpoint), credentials);
+            var selector = new SettingSelector { Fields = SettingFields.All };
+            Pageable<ConfigurationSetting> settings = client.GetConfigurationSettings(selector);
 
-        userSecretsStore.Set(setting.Key, setting.Value);
-      }
+            var userSecretsStore = new UserSecretsStore(userSecretsId);
+            IDictionary<string, string> secrets = userSecretsStore.Load();
+            ctx.Status($"Authentication against Azure Tenant {tenantId}");
 
-      ctx.Status($"Saving to User Secrets: {userSecretsId}");
+            foreach (ConfigurationSetting setting in settings)
+            {
+                ctx.Status($"Retrieving Data from App Configuration {endpoint}");
 
-      userSecretsStore.Save();
-    }).ConfigureAwait(false);
+                if (setting is SecretReferenceConfigurationSetting secretReference)
+                {
+                    var identifier = new KeyVaultSecretIdentifier(secretReference.SecretId);
+                    var secretClient = new SecretClient(identifier.VaultUri, credentials);
 
-    console.WriteLine("All Done!");
+                    Response<KeyVaultSecret>? secret = await secretClient.GetSecretAsync(identifier.Name, identifier.Version);
+                    userSecretsStore.Set(setting.Key, secret.Value.Value);
 
-    return 0;
-  }
+                    continue;
+                }
+
+                userSecretsStore.Set(setting.Key, setting.Value);
+            }
+
+            ctx.Status($"Saving to User Secrets: {userSecretsId}");
+
+            userSecretsStore.Save();
+        }).ConfigureAwait(false);
+
+        console.WriteLine("All Done!");
+
+        return 0;
+    }
 }
