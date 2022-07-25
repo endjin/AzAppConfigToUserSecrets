@@ -1,4 +1,4 @@
-﻿// <copyright file="UserSecretsStore.cs" company="Endjin Limited">
+﻿// <copyright file="UserSecrets.cs" company="Endjin Limited">
 // Copyright (c) Endjin Limited. All rights reserved.
 // </copyright>
 
@@ -11,16 +11,16 @@ namespace AzAppConfigToUserSecrets.Cli;
 /// <summary>
 /// Performs operations against the .NET User Secrets Store.
 /// </summary>
-internal class UserSecretsStore
+internal class UserSecrets
 {
     private readonly string userSecretsId;
     private IDictionary<string, string> secrets = new Dictionary<string, string>();
 
     /// <summary>
-    /// Create a new instance of the <see cref="UserSecretsStore"/>.
+    /// Create a new instance of the <see cref="UserSecrets"/>.
     /// </summary>
     /// <param name="userSecretsId">Id of the User Secret Store to interact with.</param>
-    public UserSecretsStore(string userSecretsId)
+    public UserSecrets(string userSecretsId)
     {
         this.userSecretsId = userSecretsId;
     }
@@ -42,7 +42,8 @@ internal class UserSecretsStore
     /// <summary>
     /// Save the User Secrets Store for the currently set values.
     /// </summary>
-    public void Save()
+    /// <returns>A <see cref="Task"/> representing the asynchronous save operation.</returns>
+    public async Task SaveAsync()
     {
         string? secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
         JsonObject jsonObject = new();
@@ -52,7 +53,7 @@ internal class UserSecretsStore
             jsonObject[keyValuePair.Key] = keyValuePair.Value;
         }
 
-        File.WriteAllText(secretsFilePath, jsonObject.ToString());
+        await File.WriteAllTextAsync(secretsFilePath, jsonObject.ToString()).ConfigureAwait(false);
     }
 
     /// <summary>

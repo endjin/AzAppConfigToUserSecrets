@@ -40,8 +40,8 @@ internal static class ExportHandler
             var selector = new SettingSelector { Fields = SettingFields.All };
             Pageable<ConfigurationSetting> settings = client.GetConfigurationSettings(selector);
 
-            var userSecretsStore = new UserSecretsStore(userSecretsId);
-            IDictionary<string, string> secrets = userSecretsStore.Load();
+            var userSecrets = new UserSecrets(userSecretsId);
+            IDictionary<string, string> secrets = userSecrets.Load();
             ctx.Status($"Authentication against Azure Tenant {tenantId}");
 
             foreach (ConfigurationSetting setting in settings)
@@ -54,17 +54,17 @@ internal static class ExportHandler
                     var secretClient = new SecretClient(identifier.VaultUri, credentials);
 
                     Response<KeyVaultSecret>? secret = await secretClient.GetSecretAsync(identifier.Name, identifier.Version);
-                    userSecretsStore.Set(setting.Key, secret.Value.Value);
+                    userSecrets.Set(setting.Key, secret.Value.Value);
 
                     continue;
                 }
 
-                userSecretsStore.Set(setting.Key, setting.Value);
+                userSecrets.Set(setting.Key, setting.Value);
             }
 
             ctx.Status($"Saving to User Secrets: {userSecretsId}");
 
-            userSecretsStore.Save();
+            await userSecrets.SaveAsync().ConfigureAwait(false);
         }).ConfigureAwait(false);
 
         console.WriteLine("All Done!");
