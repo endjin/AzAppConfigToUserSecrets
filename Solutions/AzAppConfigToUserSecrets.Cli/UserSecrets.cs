@@ -14,7 +14,7 @@ namespace AzAppConfigToUserSecrets.Cli;
 internal class UserSecrets
 {
     private readonly string userSecretsId;
-    private IDictionary<string, string> secrets = new Dictionary<string, string>();
+    private IDictionary<string, string?> secrets = new Dictionary<string, string?>();
 
     /// <summary>
     /// Create a new instance of the <see cref="UserSecrets"/>.
@@ -30,7 +30,7 @@ internal class UserSecrets
     /// </summary>
     /// <param name="key">Key of the value to retrieve.</param>
     /// <returns>Value stored against the provided key.</returns>
-    public string this[string key] => this.secrets[key];
+    public string this[string key] => this.secrets[key] ?? string.Empty;
 
     /// <summary>
     /// Store the provided value against the provided key.
@@ -48,7 +48,7 @@ internal class UserSecrets
         string? secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
         JsonObject jsonObject = new();
 
-        foreach (KeyValuePair<string, string> keyValuePair in this.secrets.AsEnumerable())
+        foreach (KeyValuePair<string, string?> keyValuePair in this.secrets.AsEnumerable())
         {
             jsonObject[keyValuePair.Key] = keyValuePair.Value;
         }
@@ -60,7 +60,7 @@ internal class UserSecrets
     /// Load the User Secret Store.
     /// </summary>
     /// <returns>Configuration Settings saved in the User Secrets Store.</returns>
-    public IDictionary<string, string> Load()
+    public IDictionary<string, string?> Load()
     {
         string? secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
 
@@ -68,11 +68,11 @@ internal class UserSecrets
             .AddJsonFile(secretsFilePath, true)
             .Build()
             .AsEnumerable()
-            .Where((Func<KeyValuePair<string, string>, bool>)(i => i.Value != null))
+            .Where(i => i.Value != null)
             .ToDictionary(
-                i => i.Key,
-                i => i.Value,
-                StringComparer.OrdinalIgnoreCase);
+            i => i.Key,
+            i => i.Value,
+            StringComparer.OrdinalIgnoreCase);
 
         return this.secrets;
     }
