@@ -33,7 +33,7 @@ internal class CommandLineParser
     /// <param name="endpoint">Azure App Configuration Service URL endpoint.</param>
     /// <param name="console">Console to write output to.</param>
     /// <param name="invocationContext">System.CommandLine InvocationContext for Command Line Args.</param>
-    /// <returns>Whenther the command executed correctly.</returns>
+    /// <returns>Whether the command executed correctly.</returns>
     public delegate Task<int> Export(string tenantId, string userSecretsId, string endpoint, ICompositeConsole console, InvocationContext? invocationContext = null);
 
     /// <summary>

@@ -41,7 +41,7 @@ internal static class ExportHandler
             Pageable<ConfigurationSetting> settings = client.GetConfigurationSettings(selector);
 
             var userSecrets = new UserSecrets(userSecretsId);
-            IDictionary<string, string> secrets = userSecrets.Load();
+            IDictionary<string, string?> secrets = userSecrets.Load();
             ctx.Status($"Authentication against Azure Tenant {tenantId}");
 
             foreach (ConfigurationSetting setting in settings)
