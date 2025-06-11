@@ -46,7 +46,7 @@ internal class UserSecrets
     public async Task SaveAsync()
     {
         string secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
-        
+
         // Ensure directory exists
         string? directoryPath = Path.GetDirectoryName(secretsFilePath);
         if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
