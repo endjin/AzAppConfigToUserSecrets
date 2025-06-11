@@ -1,16 +1,14 @@
-﻿// <copyright file="ExportHandler.cs" company="Endjin Limited">
+// <copyright file="ExportHandler.cs" company="Endjin Limited">
 // Copyright (c) Endjin Limited. All rights reserved.
 // </copyright>
 
-using System.CommandLine.Invocation;
-using AzAppConfigToUserSecrets.Cli.Infrastructure;
 using Azure;
 using Azure.Data.AppConfiguration;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Spectre.Console;
 
-namespace AzAppConfigToUserSecrets.Cli;
+namespace AzAppConfigToUserSecrets.Cli.Handlers;
 
 /// <summary>
 /// Exports settings data from the Azure App Configuration Service to .NET User Settings.
@@ -23,24 +21,20 @@ internal static class ExportHandler
     /// <param name="tenantId">Azure AD Tenant Id.</param>
     /// <param name="userSecretsId">User Secret Id to write settings to.</param>
     /// <param name="endpoint">Azure App Configuration Service URL endpoint.</param>
-    /// <param name="console">Console to write output to.</param>
-    /// <param name="context">System.CommandLine InvocationContext for Command Line Args.</param>
     /// <returns>Whether the command executed successfully.</returns>
     public static async Task<int> ExecuteAsync(
         string tenantId,
         string userSecretsId,
-        string endpoint,
-        ICompositeConsole console,
-        InvocationContext? context = null)
+        string endpoint)
     {
-        await console.Status().StartAsync("Thinking...", async ctx =>
+        await AnsiConsole.Status().StartAsync("Thinking...", async ctx =>
         {
-            var credentials = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions { TenantId = tenantId });
-            var client = new ConfigurationClient(new Uri(endpoint), credentials);
-            var selector = new SettingSelector { Fields = SettingFields.All };
+            InteractiveBrowserCredential credentials = new(new InteractiveBrowserCredentialOptions { TenantId = tenantId });
+            ConfigurationClient client = new(new Uri(endpoint), credentials);
+            SettingSelector selector = new() { Fields = SettingFields.All };
             Pageable<ConfigurationSetting> settings = client.GetConfigurationSettings(selector);
 
-            var userSecrets = new UserSecrets(userSecretsId);
+            UserSecrets userSecrets = new(userSecretsId);
             IDictionary<string, string?> secrets = userSecrets.Load();
             ctx.Status($"Authentication against Azure Tenant {tenantId}");
 
@@ -50,8 +44,8 @@ internal static class ExportHandler
 
                 if (setting is SecretReferenceConfigurationSetting secretReference)
                 {
-                    var identifier = new KeyVaultSecretIdentifier(secretReference.SecretId);
-                    var secretClient = new SecretClient(identifier.VaultUri, credentials);
+                    KeyVaultSecretIdentifier identifier = new(secretReference.SecretId);
+                    SecretClient secretClient = new(identifier.VaultUri, credentials);
 
                     Response<KeyVaultSecret>? secret = await secretClient.GetSecretAsync(identifier.Name, identifier.Version);
                     userSecrets.Set(setting.Key, secret.Value.Value);
@@ -67,7 +61,7 @@ internal static class ExportHandler
             await userSecrets.SaveAsync().ConfigureAwait(false);
         }).ConfigureAwait(false);
 
-        console.WriteLine("All Done!");
+        AnsiConsole.WriteLine("All Done!");
 
         return 0;
     }

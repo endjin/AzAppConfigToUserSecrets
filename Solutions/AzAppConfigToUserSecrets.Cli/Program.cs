@@ -2,9 +2,18 @@
 // Copyright (c) Endjin Limited. All rights reserved.
 // </copyright>
 
-using System.CommandLine.Parsing;
-using AzAppConfigToUserSecrets.Cli.Infrastructure;
+using AzAppConfigToUserSecrets.Cli.Commands;
+using Spectre.Console.Cli;
 
-ICompositeConsole console = new CompositeConsole();
+CommandApp app = new();
 
-return await new CommandLineParser(console).Create().InvokeAsync(args, console).ConfigureAwait(false);
+app.Configure(config =>
+{
+    config.SetApplicationName("actus");
+    config.SetApplicationVersion("1.0.0");
+    
+    config.AddCommand<ExportCommand>("export")
+        .WithDescription("Exports settings from Azure App Configuration to .NET User Secrets.");
+});
+
+return await app.RunAsync(args);

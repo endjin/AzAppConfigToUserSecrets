@@ -2,68 +2,45 @@
 // Copyright (c) Endjin Limited. All rights reserved.
 // </copyright>
 
-using System.CommandLine.IO;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
 namespace AzAppConfigToUserSecrets.Cli.Infrastructure;
 
 /// <summary>
-/// Provides interoperability between System.CommandLine and Spectre.Console.
+/// Console wrapper for Spectre.Console operations.
 /// </summary>
 internal sealed class CompositeConsole : ICompositeConsole
 {
-    private readonly AnsiConsoleStreamWriter standardOut;
-    private readonly IStandardStreamWriter standardError;
+    private readonly IAnsiConsole console;
 
     /// <summary>
-    /// Create a new instance of CompositeConsole.
+    /// Initializes a new instance of the <see cref="CompositeConsole"/> class.
     /// </summary>
-    public CompositeConsole()
+    /// <param name="console">The underlying console instance.</param>
+    public CompositeConsole(IAnsiConsole? console = null)
     {
-        this.standardOut = new AnsiConsoleStreamWriter(AnsiConsole.Console);
-        this.standardError = StandardStreamWriter.Create(Console.Error);
+        this.console = console ?? AnsiConsole.Console;
     }
 
     /// <inheritdoc />
-    bool IStandardOut.IsOutputRedirected => Console.IsOutputRedirected;
+    public Profile Profile => this.console.Profile;
 
     /// <inheritdoc />
-    bool IStandardError.IsErrorRedirected => Console.IsErrorRedirected;
+    public IAnsiConsoleCursor Cursor => this.console.Cursor;
 
     /// <inheritdoc />
-    bool IStandardIn.IsInputRedirected => Console.IsInputRedirected;
+    public IAnsiConsoleInput Input => this.console.Input;
 
     /// <inheritdoc />
-    IStandardStreamWriter IStandardOut.Out => this.standardOut;
+    public IExclusivityMode ExclusivityMode => this.console.ExclusivityMode;
 
     /// <inheritdoc />
-    IStandardStreamWriter IStandardError.Error => this.standardError;
+    public RenderPipeline Pipeline => this.console.Pipeline;
 
     /// <inheritdoc />
-    public Profile Profile => AnsiConsole.Console.Profile;
+    public void Clear(bool home) => this.console.Clear(home);
 
     /// <inheritdoc />
-    public IAnsiConsoleCursor Cursor => AnsiConsole.Console.Cursor;
-
-    /// <inheritdoc />
-    public IAnsiConsoleInput Input => AnsiConsole.Console.Input;
-
-    /// <inheritdoc />
-    public IExclusivityMode ExclusivityMode => AnsiConsole.Console.ExclusivityMode;
-
-    /// <inheritdoc />
-    public RenderPipeline Pipeline => AnsiConsole.Console.Pipeline;
-
-    /// <inheritdoc />
-    public void Clear(bool home)
-    {
-        AnsiConsole.Console.Clear(home);
-    }
-
-    /// <inheritdoc />
-    public void Write(IRenderable renderable)
-    {
-        AnsiConsole.Console.Write(renderable);
-    }
+    public void Write(IRenderable renderable) => this.console.Write(renderable);
 }

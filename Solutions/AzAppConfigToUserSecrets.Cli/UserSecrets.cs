@@ -37,7 +37,7 @@ internal class UserSecrets
     /// </summary>
     /// <param name="key">Key to store the value.</param>
     /// <param name="value">Value to store.</param>
-    public void Set(string key, string value) => this.secrets[key] = value;
+    public void Set(string key, string? value) => this.secrets[key] = value;
 
     /// <summary>
     /// Save the User Secrets Store for the currently set values.
@@ -45,7 +45,15 @@ internal class UserSecrets
     /// <returns>A <see cref="Task"/> representing the asynchronous save operation.</returns>
     public async Task SaveAsync()
     {
-        string? secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
+        string secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
+        
+        // Ensure directory exists
+        string? directoryPath = Path.GetDirectoryName(secretsFilePath);
+        if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
         JsonObject jsonObject = new();
 
         foreach (KeyValuePair<string, string?> keyValuePair in this.secrets.AsEnumerable())
@@ -62,17 +70,24 @@ internal class UserSecrets
     /// <returns>Configuration Settings saved in the User Secrets Store.</returns>
     public IDictionary<string, string?> Load()
     {
-        string? secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
+        string secretsFilePath = PathHelper.GetSecretsPathFromSecretsId(this.userSecretsId);
 
-        this.secrets = new ConfigurationBuilder()
-            .AddJsonFile(secretsFilePath, true)
-            .Build()
-            .AsEnumerable()
-            .Where(i => i.Value != null)
-            .ToDictionary(
-            i => i.Key,
-            i => i.Value,
-            StringComparer.OrdinalIgnoreCase);
+        if (File.Exists(secretsFilePath))
+        {
+            this.secrets = new ConfigurationBuilder()
+                .AddJsonFile(secretsFilePath, true)
+                .Build()
+                .AsEnumerable()
+                .Where(i => i.Value != null)
+                .ToDictionary(
+                i => i.Key,
+                i => i.Value,
+                StringComparer.OrdinalIgnoreCase);
+        }
+        else
+        {
+            this.secrets = new Dictionary<string, string?>();
+        }
 
         return this.secrets;
     }
