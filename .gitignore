@@ -346,6 +346,15 @@ healthchecksdb
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
 
+# Cobertura code coverage file
+coverage.cobertura.xml
+
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /Solutions/AzAppConfigToUserSecrets.Cli/Properties/launchSettings.json
+
+# build outputs
+_codeCoverage/
+_packages/
+.zf/extensions/
+*.sbom.*
