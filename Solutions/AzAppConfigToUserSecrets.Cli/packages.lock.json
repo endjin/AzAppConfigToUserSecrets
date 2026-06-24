@@ -57,19 +57,13 @@
           "Microsoft.Extensions.FileProviders.Physical": "8.0.0"
         }
       },
-      "Roslynator.Analyzers": {
-        "type": "Direct",
-        "requested": "[4.13.1, )",
-        "resolved": "4.13.1",
-        "contentHash": "KZpLy6ZlCebMk+d/3I5KU2R7AOb4LNJ6tPJqPtvFXmO8bEBHQvCIAvJOnY2tu4C9/aVOROTDYUFADxFqw1gh/g=="
-      },
       "Spectre.Console": {
         "type": "Direct",
-        "requested": "[0.50.0, )",
-        "resolved": "0.50.0",
-        "contentHash": "gkwYncFqMjlPF6Yz8KeVsKWpdfv15sr6uKm+vXVa/8Q4tvx52LPzMQOO5m+bXwI3AGGFeY3cok3ZJbguYizswg==",
+        "requested": "[0.57.1, )",
+        "resolved": "0.57.1",
+        "contentHash": "h/B0CJLR5Ba8yq+iVjjZR9JXMS+8a1syHmHhyZ6w5m8rHDWLGOlaKAhzJanHJL62rZxynLeVOx+43MKvskJ1lA==",
         "dependencies": {
-          "System.Memory": "4.6.3"
+          "Spectre.Console.Ansi": "0.57.1"
         }
       },
       "Spectre.Console.Cli": {
@@ -79,15 +73,6 @@
         "contentHash": "PrctsupqHEbyoP/iRL30awUWB0Z91i21myKl70qcPwoH6marEPkPyaPgzc37xFm9QSx+/jVBQGUH7tsn0mWGNQ==",
         "dependencies": {
           "Spectre.Console": "0.50.0"
-        }
-      },
-      "StyleCop.Analyzers": {
-        "type": "Direct",
-        "requested": "[1.2.0-beta.556, )",
-        "resolved": "1.2.0-beta.556",
-        "contentHash": "llRPgmA1fhC0I0QyFLEcjvtM2239QzKr/tcnbsjArLMJxJlu0AA5G7Fft0OI30pHF3MW63Gf4aSSsjc5m82J1Q==",
-        "dependencies": {
-          "StyleCop.Analyzers.Unstable": "1.2.0.556"
         }
       },
       "Azure.Core": {
@@ -236,10 +221,10 @@
           "Microsoft.SourceLink.Common": "1.1.1"
         }
       },
-      "StyleCop.Analyzers.Unstable": {
+      "Spectre.Console.Ansi": {
         "type": "Transitive",
-        "resolved": "1.2.0.556",
-        "contentHash": "zvn9Mqs/ox/83cpYPignI8hJEM2A93s2HkHs8HYMOAQW0PkampyoErAiIyKxgTLqbbad29HX/shv/6LGSjPJNQ=="
+        "resolved": "0.57.1",
+        "contentHash": "IFlXdGXOGD4XCK5ybZsXgQo7PE0ZE/pt9YFFWo2cECTipS8DrViLFazx+K00/A+fY1PlHYt1Vqwrjfod4EEckw=="
       },
       "System.ClientModel": {
         "type": "Transitive",
@@ -260,8 +245,8 @@
       },
       "System.Memory": {
         "type": "Transitive",
-        "resolved": "4.6.3",
-        "contentHash": "qdcDOgnFZY40+Q9876JUHnlHu7bosOHX8XISRoH94fwk6hgaeQGSgfZd8srWRZNt5bV9ZW2TljcegDNxsf+96A=="
+        "resolved": "4.5.5",
+        "contentHash": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw=="
       },
       "System.Memory.Data": {
         "type": "Transitive",
